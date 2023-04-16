@@ -52,21 +52,21 @@ export default function SearchBox(props: SearchBoxProps) {
     }
   }
 
-  function updateSearchValueFromSessionStorage(){
+  function updateSearchValueFromSessionStorage() {
     if (sessionStorage) {
-        const searchFromSessionStorage = sessionStorage.getItem("search");
-        if (searchFromSessionStorage) {
-          inputRef.current!.value = JSON.parse(searchFromSessionStorage);
-          sessionStorage.removeItem("search");
-        }
+      const searchFromSessionStorage = sessionStorage.getItem("search");
+      if (searchFromSessionStorage) {
+        inputRef.current!.value = JSON.parse(searchFromSessionStorage);
+        sessionStorage.removeItem("search");
       }
+    }
   }
 
   return (
     <section>
       <form
         onSubmit={(event: SyntheticEvent) => event.preventDefault()}
-        className="flex flex-row items-center gap-2"
+        className="flex flex-row items-center gap-4"
       >
         <input
           className="bg-background border-2 border-color-main rounded-md p-2 w-full outline-color-main"
@@ -76,6 +76,7 @@ export default function SearchBox(props: SearchBoxProps) {
           placeholder={props.placeholder}
           onInput={handleOnInput}
           defaultValue={props.defaultValue}
+          size={30}
         ></input>
         <button onClick={handleOnSearch}>
           {isSearching ? <ImSpinner8 className="animate-spin" /> : <ImSearch />}

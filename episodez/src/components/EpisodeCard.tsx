@@ -1,4 +1,5 @@
 import { Episode } from "@/types";
+import { zeroPad } from "@/utils/format";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -12,7 +13,7 @@ interface EpisodeCardProps {
 export default function EpisodeCard(props: EpisodeCardProps) {
   return (
     <Link href={`/episodes/${props.episode.id}`}>
-      <h3 className="mb-4">{`EP${props.episode.number} ${props.episode.name}`}</h3>
+      <h3 className="mb-4">{`E${zeroPad(props.episode.number, 2)} ${props.episode.name}`}</h3>
       {props.episode.image && (
         <Image
           width={1266}

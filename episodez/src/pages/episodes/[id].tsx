@@ -5,18 +5,16 @@ import Image from "next/image";
 import { IoMdStar } from "react-icons/io";
 import { Noto_Sans_Mono } from "next/font/google";
 import { zeroPad } from "@/utils/format";
+import Header from "@/components/Header";
 
 const notoSansMono = Noto_Sans_Mono({ subsets: ["latin"] });
 
 export default function EpisodeDetailsPage(props: { episode: Episode }) {
   return (
-    <div className="grow overflow-auto">
-      <main
-        className={
-          notoSansMono.className +
-          " w-full md:w-1/2 mx-auto flex flex-col gap-8 px-4 pt-12 "
-        }
-      >
+    <div className={"grow overflow-auto p-4 " + notoSansMono.className}>
+      <Header />
+
+      <main className=" w-full md:w-1/2 mx-auto flex flex-col gap-8 px-4 pt-12 ">
         <header className="flex flex-row gap-4 items-start justify-between">
           <h2 className="text-xl font-bold">{`${props.episode.name} S${zeroPad(
             props.episode.season,

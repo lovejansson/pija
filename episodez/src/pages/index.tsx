@@ -5,20 +5,17 @@ import { Episode, SeasonsWithEpisodes, Series } from "@/types";
 import { useTransition } from "@/utils/useTransition";
 import Tabs, { Tab } from "@/components/Tabs";
 import Episodes from "@/components/Episodes";
+import Header from "@/components/Header";
 
 const notoSansMono = Noto_Sans_Mono({ subsets: ["latin"] });
+
+const defaultSearch = "Buffy the vampire slayer";
 
 export default function Home() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [series, setSeries] = useState<Series>();
   const [initDone, setInitDone] = useState(false);
   const [tabs, setTabs] = useState<Tab[]>();
-
-  const handlePageTransition = useCallback(() => {
-    series && saveStateToSessionStorage();
-  }, [series]);
-
-  useTransition(handlePageTransition);
 
   useEffect(() => {
     // On first render we check if there is a series in session storage and if so we restore it.
@@ -30,7 +27,23 @@ export default function Home() {
     }
   }, [series]);
 
-  useEffect(updateSeriesFromSessionStorage, []);
+  useEffect(() => {
+    initSeries();
+  }, []);
+
+  async function initSeries() {
+    const hasSavedSeriesInSessionStorage = updateSeriesFromSessionStorage();
+
+    if (!hasSavedSeriesInSessionStorage) {
+      await search(defaultSearch);
+    }
+  }
+
+  const handlePageTransition = useCallback(() => {
+    series && saveStateToSessionStorage();
+  }, [series]);
+
+  useTransition(handlePageTransition);
 
   function updateScrollTopFromSessionStorage() {
     if (sessionStorage) {
@@ -38,17 +51,6 @@ export default function Home() {
       if (scrollTop) {
         scrollContainerRef!.current!.scrollTop = parseInt(scrollTop);
         sessionStorage.removeItem("scroll-top");
-      }
-    }
-  }
-
-  function updateSeriesFromSessionStorage() {
-    if (sessionStorage) {
-      const seriesFromSessionStorage = sessionStorage.getItem("series");
-      if (seriesFromSessionStorage) {
-        setSeries(JSON.parse(seriesFromSessionStorage));
-        updateTabs(JSON.parse(seriesFromSessionStorage));
-        sessionStorage.removeItem("series");
       }
     }
   }
@@ -63,6 +65,19 @@ export default function Home() {
     }
   }
 
+  function updateSeriesFromSessionStorage() {
+    if (sessionStorage) {
+      const seriesFromSessionStorage = sessionStorage.getItem("series");
+      if (seriesFromSessionStorage) {
+        setSeries(JSON.parse(seriesFromSessionStorage));
+        updateTabs(JSON.parse(seriesFromSessionStorage));
+        sessionStorage.removeItem("series");
+        return true;
+      }
+    }
+    return false;
+  }
+
   async function search(value: string) {
     try {
       const response = await fetch(
@@ -75,6 +90,9 @@ export default function Home() {
         updateTabs(data);
       } else if (response.status === 404) {
         return "No series found :|";
+      } else {
+        console.log(response);
+        return "Something went wrong :(";
       }
     } catch (e) {
       console.log(e);
@@ -104,14 +122,18 @@ export default function Home() {
   }
 
   return (
-    <div ref={scrollContainerRef} className="grow overflow-auto">
-      <main
-        className={
-          "flex flex-col items-center gap-8 px-4 pt-12 w-full md:w-3/4 lg:w-1/2 mx-auto " +
-          notoSansMono.className
-        }
-      >
-        <SearchBox searchFn={search} placeholder="Series name..." />
+    <div
+      ref={scrollContainerRef}
+      className={"grow overflow-auto p-4 " + notoSansMono.className}
+    >
+      <Header />
+
+      <main className="flex flex-col items-center gap-8  w-full xl:w-1/2 2xl:w-1/3 mx-auto ">
+        <SearchBox
+          searchFn={search}
+          placeholder="Series name..."
+          defaultValue={defaultSearch}
+        />
 
         {series && (
           <section className="hidden md:block">
